@@ -1,5 +1,7 @@
-package com.garage.garage.Client;
+package com.garage.garage.Config;
 
+import com.garage.garage.Client.Client;
+import com.garage.garage.Client.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;

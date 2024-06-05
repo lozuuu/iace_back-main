@@ -12,7 +12,7 @@ import java.util.Optional;
 
 //@Repository
 public interface ClientRepository extends JpaRepository<Client, Integer> {
-    @Query(value = "select * from client where email = ?1", nativeQuery = true)
+    @Query(value = "select * from client where adres_email = ?1", nativeQuery = true)
     Optional<Client> findByAdresEmail(String email);
 
 }

@@ -29,10 +29,10 @@ public class Client {
     @Column(name = "Adres_email", length = 45)
     private String adresEmail;
 
-    @Column(name = "Haslo", length = 45)
+    @Column(name = "Haslo", length = 200)
     private String haslo;
 
     @Column(name = "Roles", length = 45)
-    private String Roles;
+    private String roles;
 
 }
