@@ -18,5 +18,6 @@ public class OurUserInfoUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Client> user = repo.findByAdresEmail(username);
         return user.map(OurUserInfoUserDetails::new).orElseThrow(()->new UsernameNotFoundException("user does not exist"));
+
     }
 }

@@ -1,5 +1,6 @@
 package com.garage.garage.Reservation;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.garage.garage.Car.Car;
 import com.garage.garage.Client.Client;
 import jakarta.persistence.*;
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @Entity
+
 @Table(name = "Reservation", schema = "mydb")
 public class Reservation {
     @Id
@@ -19,9 +21,6 @@ public class Reservation {
     @Column(name = "ID_rezerwacji", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_samochodu")
-    private Car idSamochodu;
 
     @Column(name = "Opis_problemu", length = 200)
     private String opisProblemu;
