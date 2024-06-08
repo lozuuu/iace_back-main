@@ -9,7 +9,7 @@ import java.time.LocalTime;
 import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
-    @Query(value = "select * from reservation where data_rezerwacji = ?1 ", nativeQuery = true)
+    @Query(value = "select * from reservation where data_rezerwacji = ?1 and godzina_rezerwacji - ?2 ", nativeQuery = true)
     Optional<Reservation>checkDate(LocalDate date, LocalTime time);
 
 }

@@ -2,11 +2,13 @@ package com.garage.garage.controller;
 
 import com.garage.garage.Client.Client;
 import com.garage.garage.Client.ClientRepository;
+import com.garage.garage.Config.WebSecurityConfig;
 import com.garage.garage.Reservation.Reservation;
 import com.garage.garage.Reservation.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +29,11 @@ public class Controller {
 
     @Autowired
     private ReservationRepository reservationRepo;
+
+    @Autowired
+    private WebSecurityConfig webSecurityConfig;
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
 
     @GetMapping("/")
         public String goHome() {
@@ -64,28 +71,39 @@ public class Controller {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PostMapping(path = "/reservate/")
+    @PostMapping(path = "/user/reservate/")
     public ResponseEntity<Object> createReservation(@RequestBody Reservation reservation) {
-//
-//        if(reservationRepo.checkDate(reservation.getDataRezerwacji(),reservation.getGodzinaRezerwacji()).isPresent())
-//        {
-//           //
-//            return ResponseEntity.ok("Rezerwacja wyswietl");
-//        }
-//        else
-//        {
-//            reservationRepo.save(reservation);
-//        }
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        webSecurityConfig.authenticationProvider().authenticate(authentication);
+
+
         Optional<Reservation> reservationOp = Optional.of(new Reservation());
-        reservationRepo.save(reservation);
+        reservationOp = reservationRepo.checkDate(reservation.getDataRezerwacji(),
+                reservation.getGodzinaRezerwacji());
 
+        if (reservationOp.isPresent()){
+            return ResponseEntity.ok("Reservation not created");
+        }
+        else{
+            UserDetails userDetails = getLoggedInUserDetails();
+            Client client = repo.findByAdresEmail(userDetails.getUsername());
+            reservation.setIdKlienta(client);
+            reservationRepo.save(reservation);
+            return ResponseEntity.ok("Reservation created");
+        }
 
-
-        return ResponseEntity.ok("Reservation created");
     }
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @GetMapping(path = "/getReservations/")
+
+
+
+
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @GetMapping(path = "/user/getreservations/")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Object> getReservations() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        webSecurityConfig.authenticationProvider().authenticate(authentication);
+
         return ResponseEntity.ok(reservationRepo.findAll());
 //        List<Reservation> reservations = reservationRepo.findAll();
 //        return ResponseEntity.ok(reservations);
