@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,4 +110,46 @@ public class Controller {
 //        List<Reservation> reservations = reservationRepo.findAll();
 //        return ResponseEntity.ok(reservations);
     }
+    @GetMapping(path = "/admin/reservations/")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public List<Reservation> getAdminReservations()
+    {
+
+        LocalDate today = LocalDate.now();
+        Optional<List<Reservation>> list = reservationRepo.checkAdminDate(today);
+        if(list.isPresent()) {
+            List<Reservation> reservations = list.get();
+            return reservations;
+        }
+        else
+            return (List<Reservation>) ResponseEntity.ok("Admin reservations not available");
+
+    }
+    @GetMapping(path = "/user/myreservations/")
+    @PreAuthorize("hasAnyAuthority('USER')")
+    public List<Reservation> getMyReservations() {
+        Client client = repo.findByAdresEmail(getLoggedInUserDetails().getUsername());
+
+        Optional<List<Reservation>> list = reservationRepo.checkUserId(client.getId());
+        if (list.isPresent()) {
+            List<Reservation> reservations = list.get();
+            return reservations;
+        } else
+            return (List<Reservation>) ResponseEntity.ok("My reservations not available");
+    }
+    @PatchMapping(path = "/user/updateuser")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    public ResponseEntity<Object> updateUser(@RequestBody Client client) {
+        Client client1 = repo.findByAdresEmail(getLoggedInUserDetails().getUsername());
+        if(client.getHaslo() != null)
+            client1.setHaslo(passwordEncoder.encode(client.getHaslo()));
+
+        if(client.getAdresEmail() != null)
+
+            client1.setAdresEmail(client.getAdresEmail());
+        repo.save(client1);
+        return ResponseEntity.ok("User updated");
+    }
+
+
 }

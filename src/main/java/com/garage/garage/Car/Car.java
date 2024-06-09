@@ -15,7 +15,7 @@ public class Car {
     @Column(name = "ID_samochodu", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ID_klienta")
     private Client idKlienta;
 
