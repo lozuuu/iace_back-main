@@ -2,20 +2,17 @@ package com.garage.garage.controller;
 
 import com.garage.garage.Client.Client;
 import com.garage.garage.Client.ClientRepository;
-import com.garage.garage.Config.WebSecurityConfig;
 import com.garage.garage.Reservation.Reservation;
 import com.garage.garage.Reservation.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,15 +29,13 @@ public class Controller {
     @Autowired
     private ReservationRepository reservationRepo;
 
-    @Autowired
-    private WebSecurityConfig webSecurityConfig;
-    @Autowired
-    private AuthenticationProvider authenticationProvider;
 
     @GetMapping("/")
         public String goHome() {
         return "Hello World";
     }
+
+
     @PostMapping("/user/save/")
     public ResponseEntity<Object> saveUser(@RequestBody Client client) {
         client.setHaslo(passwordEncoder.encode(client.getHaslo()));
@@ -75,10 +70,6 @@ public class Controller {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PostMapping(path = "/user/reservate/")
     public ResponseEntity<Object> createReservation(@RequestBody Reservation reservation) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        webSecurityConfig.authenticationProvider().authenticate(authentication);
-
-
         Optional<Reservation> reservationOp = Optional.of(new Reservation());
         reservationOp = reservationRepo.checkDate(reservation.getDataRezerwacji(),
                 reservation.getGodzinaRezerwacji());
@@ -96,25 +87,15 @@ public class Controller {
 
     }
 
-
-
-
-//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @GetMapping(path = "/user/getreservations/")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Object> getReservations() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        webSecurityConfig.authenticationProvider().authenticate(authentication);
-
         return ResponseEntity.ok(reservationRepo.findAll());
-//        List<Reservation> reservations = reservationRepo.findAll();
-//        return ResponseEntity.ok(reservations);
     }
     @GetMapping(path = "/admin/reservations/")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public List<Reservation> getAdminReservations()
     {
-
         LocalDate today = LocalDate.now();
         Optional<List<Reservation>> list = reservationRepo.checkAdminDate(today);
         if(list.isPresent()) {
@@ -137,7 +118,7 @@ public class Controller {
         } else
             return (List<Reservation>) ResponseEntity.ok("My reservations not available");
     }
-    @PatchMapping(path = "/user/updateuser")
+    @PatchMapping(path = "/user/updateuser/")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<Object> updateUser(@RequestBody Client client) {
         Client client1 = repo.findByAdresEmail(getLoggedInUserDetails().getUsername());
